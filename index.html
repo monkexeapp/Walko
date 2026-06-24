@@ -47,10 +47,12 @@ html, body {
 #app {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
   height: 100vh;
+  height: 100dvh;
   position: relative;
+  overflow: hidden;
 }
+html.js-vh-fix #app { height: var(--app-height, 100vh); }
 
 /* ===== HEADER ===== */
 #header {
@@ -154,6 +156,7 @@ html, body {
 /* ===== MAP ===== */
 #map-wrap {
   flex: 1;
+  min-height: 0;
   position: relative;
   margin: 0 10px;
   border-radius: var(--radius-md);
@@ -214,32 +217,32 @@ html, body {
 /* ===== BOTTOM SHEET ===== */
 #bottom {
   background: var(--white);
-  border-radius: 22px 22px 0 0;
-  padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
+  border-radius: 18px 18px 0 0;
+  padding: 8px 12px calc(6px + env(safe-area-inset-bottom));
   box-shadow: 0 -8px 24px rgba(76,47,184,0.10);
   z-index: 50;
   flex-shrink: 0;
-  margin-top: 8px;
+  margin-top: 6px;
 }
 #stats-row {
   display: flex;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: 6px;
+  margin-bottom: 8px;
 }
 .stat-card {
   flex: 1;
   background: var(--violet-50);
   border-radius: var(--radius-sm);
-  padding: 6px 6px;
+  padding: 5px 5px;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
 }
-.stat-icon { width: 28px; height: 28px; object-fit: contain; }
-.stat-val { font-size: 15px; font-weight: 800; color: var(--violet-700); line-height: 1; }
-.stat-lbl { font-size: 8.5px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
+.stat-icon { width: 24px; height: 24px; object-fit: contain; }
+.stat-val { font-size: 14px; font-weight: 800; color: var(--violet-700); line-height: 1; }
+.stat-lbl { font-size: 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; }
 
 #collect-btn {
   width: 100%;
@@ -426,7 +429,7 @@ html, body {
   <div id="header">
     <div id="header-top">
       <div id="brand">
-        <div id="brand-name">Walko</div>
+        <div id="brand-name" id="brand-name" ontouchstart="startLongPress()" ontouchend="cancelLongPress()" onmousedown="startLongPress()" onmouseup="cancelLongPress()" onmouseleave="cancelLongPress()">Walko</div>
       </div>
       <div id="gps-pill"><span id="gps-dot"></span><span id="gps-text">GPS...</span></div>
     </div>
@@ -490,6 +493,16 @@ html, body {
 
 <script>
 let map, playerMarker;
+
+// Fix hauteur réelle viewport pour Safari iOS (barre d'adresse dynamique)
+function setAppHeight() {
+  document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+  document.documentElement.classList.add('js-vh-fix');
+}
+setAppHeight();
+window.addEventListener('resize', setAppHeight);
+window.addEventListener('orientationchange', setAppHeight);
+
 let currentPos = null;
 let crosswalks = new Map(); // id -> { lat, lng, marker, collected }
 let nearbyIds = [];
@@ -676,6 +689,13 @@ function closeModal() {
 function confirmModalAction() {
   const id = modalTargetId;
   if (!id) return;
+
+  if (id === 'RESET_ALL') {
+    resetAll();
+    closeModal();
+    return;
+  }
+
   const cw = crosswalks.get(id);
   if (!cw) { closeModal(); return; }
 
@@ -796,6 +816,42 @@ function distM(lat1, lng1, lat2, lng2) {
   const dLng = (lng2-lng1)*Math.PI/180;
   const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+/* ===== RESET (appui long sur le logo Walko) ===== */
+let longPressTimer = null;
+function startLongPress() {
+  longPressTimer = setTimeout(openResetModal, 600);
+}
+function cancelLongPress() {
+  if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+}
+function openResetModal() {
+  modalTargetId = 'RESET_ALL';
+  const overlay = document.getElementById('modal-overlay');
+  const title = document.getElementById('modal-title');
+  const sub = document.getElementById('modal-sub');
+  const confirmBtn = document.getElementById('modal-confirm-btn');
+
+  title.textContent = 'Réinitialiser tous les passages ?';
+  sub.textContent = 'Tous tes passages validés seront effacés. Cette action est irréversible.';
+  confirmBtn.textContent = 'Tout réinitialiser';
+  confirmBtn.className = 'modal-btn danger';
+
+  overlay.classList.add('show');
+}
+function resetAll() {
+  localStorage.setItem('walko_collected', '[]');
+  crosswalks.forEach((cw, id) => {
+    if (cw.collected) {
+      cw.collected = false;
+      const div = document.getElementById('cwdiv-' + id);
+      if (div) div.innerHTML = '<div class="cw-pending"></div>';
+    }
+  });
+  refreshCounts();
+  updateNearby();
+  showToast('Tous les passages ont été réinitialisés');
 }
 
 function getSaved() {
