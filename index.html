@@ -166,14 +166,25 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 }
 #map { width: 100%; height: 100%; }
 #map .leaflet-container { background: #ECE7FA; font-family: 'Poppins', sans-serif; }
-.leaflet-tile { filter: saturate(0.55) brightness(1.04) hue-rotate(225deg) contrast(0.96); }
+.leaflet-tile { filter: saturate(0.85) contrast(0.97); }
 
-.player-icon {
-  width: 22px; height: 22px;
-  background: var(--violet-600);
+.player-icon-wrap {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.player-icon-halo {
+  position: absolute;
+  width: 34px; height: 34px;
   border-radius: 50%;
-  border: 3px solid #fff;
-  box-shadow: 0 0 0 7px rgba(108,79,224,0.22), 0 2px 6px rgba(0,0,0,0.25);
+  background: rgba(108,79,224,0.18);
+}
+.player-arrow {
+  position: relative;
+  width: 22px; height: 22px;
+  transition: transform 0.35s ease;
+  transform-origin: 50% 50%;
+  filter: drop-shadow(0 2px 4px rgba(76,47,184,0.35));
 }
 
 .cw-marker {
@@ -534,12 +545,19 @@ function initMap() {
   map = L.map('map', { zoomControl: false, attributionControl: false, tap: true })
     .setView([48.8566, 2.3522], 17);
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '© OSM'
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 19, subdomains: 'abcd', attribution: '© OSM © CARTO'
   }).addTo(map);
   L.control.attribution({ prefix: false, position: 'bottomleft' }).addTo(map);
 
-  const playerDiv = L.divIcon({ className: '', html: '<div class="player-icon"></div>', iconSize: [22,22], iconAnchor: [11,11] });
+  const playerHtml = `
+    <div class="player-icon-wrap">
+      <div class="player-icon-halo"></div>
+      <svg class="player-arrow" id="player-arrow-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2 L19 21 L12 16.5 L5 21 Z" fill="#6C4FE0" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
+      </svg>
+    </div>`;
+  const playerDiv = L.divIcon({ className: '', html: playerHtml, iconSize: [34,34], iconAnchor: [17,17] });
   playerMarker = L.marker([48.8566, 2.3522], { icon: playerDiv, zIndexOffset: 1000 }).addTo(map);
 }
 
@@ -551,6 +569,49 @@ function startGPS() {
   navigator.geolocation.watchPosition(onPosition, onGPSError, {
     enableHighAccuracy: true, maximumAge: 3000, timeout: 15000
   });
+  startCompass();
+}
+
+let currentHeading = 0;
+function setPlayerHeading(deg) {
+  currentHeading = deg;
+  const svg = document.getElementById('player-arrow-svg');
+  if (svg) svg.style.transform = `rotate(${deg}deg)`;
+}
+
+function startCompass() {
+  // Priorité à la boussole native du téléphone (cap réel, fiable même immobile)
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // iOS 13+ nécessite une permission explicite, déclenchée par un geste utilisateur
+    document.body.addEventListener('click', requestCompassPermissionOnce, { once: true });
+  } else {
+    window.addEventListener('deviceorientationabsolute', onDeviceOrientation);
+    window.addEventListener('deviceorientation', onDeviceOrientation);
+  }
+}
+
+let compassPermissionRequested = false;
+function requestCompassPermissionOnce() {
+  if (compassPermissionRequested) return;
+  compassPermissionRequested = true;
+  DeviceOrientationEvent.requestPermission().then(state => {
+    if (state === 'granted') {
+      window.addEventListener('deviceorientationabsolute', onDeviceOrientation);
+      window.addEventListener('deviceorientation', onDeviceOrientation);
+    }
+  }).catch(() => {});
+}
+
+function onDeviceOrientation(e) {
+  let heading = null;
+  if (typeof e.webkitCompassHeading === 'number') {
+    heading = e.webkitCompassHeading; // iOS Safari : déjà le cap réel (0 = nord)
+  } else if (e.absolute && typeof e.alpha === 'number') {
+    heading = 360 - e.alpha; // Android : alpha inversé par rapport au cap
+  }
+  if (heading !== null && !isNaN(heading)) {
+    setPlayerHeading(heading);
+  }
 }
 
 function onPosition(pos) {
@@ -562,6 +623,12 @@ function onPosition(pos) {
   document.getElementById('gps-dot').classList.add('active');
 
   playerMarker.setLatLng([lat, lng]);
+
+  // Fallback : si la boussole magnétique n'a pas encore donné de cap fiable,
+  // on utilise le cap de déplacement du GPS (disponible seulement en mouvement)
+  if (typeof pos.coords.heading === 'number' && !isNaN(pos.coords.heading) && pos.coords.speed > 0.5) {
+    setPlayerHeading(pos.coords.heading);
+  }
 
   if (!lastLoadPos || distM(lat, lng, lastLoadPos.lat, lastLoadPos.lng) > LOAD_RADIUS * 0.5) {
     map.setView([lat, lng], 17, { animate: true, duration: 1 });
