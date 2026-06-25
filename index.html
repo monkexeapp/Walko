@@ -278,7 +278,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   box-shadow: none;
   cursor: default;
 }
-#collect-btn img { width: 18px; height: 18px; }
+#collect-btn img { width: 26px; height: 26px; }
 
 /* ===== TOAST ===== */
 #toast {
@@ -350,6 +350,18 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+#demo-btn {
+  margin-top: 14px;
+  padding: 8px 16px;
+  background: transparent;
+  color: rgba(255,255,255,0.65);
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .leaflet-control-attribution { font-size: 9px !important; opacity: 0.5; }
@@ -487,6 +499,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 <div id="loading">
   <h1>Walko</h1>
   <button id="start-btn" onclick="startApp()">Commencer</button>
+  <button id="demo-btn" onclick="startApp(true)">Tester sans GPS (mode démo)</button>
 </div>
 
 <!-- APP -->
@@ -540,7 +553,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
       </div>
     </div>
     <button id="collect-btn" disabled onclick="collectNearby()">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADVElEQVRo3u2YS2xMURzGv5mO29vSjEc8Oo2EiGQSiY1EglDxiKRqJYiFCDZiKawsREhIRC1Qr0Rib0FTTYSFWjTxSiQ2LUU84k2HotpqfxZtxtTMvXPuudfYzLebOef+v+88/o/zl8ooo4wy/jNidp8hSa5qlVRMvXqj79am7OhxWU8Lz/lMD6+4wTZqGJFVEvokTXwnFwNcZBolok9wkF/ko5lK/hlpDIdK4gixiPcUwldWI0QF1bjEzMQkDK5bpRZrrdIap7dqV6vWaWrBqTVq1EM1aoVSGlSnWrmlvljIlYsZnOJLdpW/uE0nXujmDkPZX984TyrU1UTM4BJh0BJCAsLhJGFxHtdewHIyoQX0ssZvD+K+sa5BydAuNEGNfsNxnzFH6Ui8OC3XTkBMTiQCHFXYCRjUm0gEvNZPOwHDatdQBGH0pqUVxHQ6At34Qd79laTgATMJfgkRCS3UTtUEUPxF+1SvLXoy5t+p2q+GgLEAkeQgHwKtPsNOKhBif97YN5qZZhwRES7HCyZcE3pxoOCMC0zAOAFtyDtJc/p6nhac089Woz1AuFzxpHpGB5986Jf55MprjDcTMItnHiY6mMd4GnjsSd/ls0+vmGsmYD4fPUzsHSVaQXdgesiwIKyAE1mylXTnnX1X0ZtiKGA2zz1M9LAjS7iK++wKQA8vmWMmoIpWTyOfsxLi1OEEoIc2qjB0w830FZOQM9uMvo/NhqEIUc1photLCEA/TDPVBAjFUzjmU479OQgz+h6OMjloNnBYTlPW3fIl7CbNRh4VJX9CE/U4WKXjWm57Gh7gHT8MVn+XWiyrAbE955lhiyF2WFXFkuKq9x03QxEr/lVxbSQ1YcqvuPWvCQcjETDg5/5x3w87IxHQpX4LATFJatPX0PS9arPsHyEqORPgvheOneesH6cSIsXlQC6X/zyvC9cfECnO0pvToLgzph4ai05u0p8TgJuLdwdixUXI1RKtVVqOXqtdrdqjPR6Tj+qwVmqp6jSgR7que+qPpHs42qRyRxPQ0ryydAQfWMLI3AQVpk0quzbdkQKnPcQhEqXqFE7ixF8lyw+OkyxRp3S0ZNnEVV6SIcMLWlhv62xhmtVVSmmipJ6RDkAJm9VllFFGGVHiN/8e6tgDxdZrAAAAAElFTkSuQmCC" alt="">
+      <img id="collect-btn-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAB0VBMVEUAAABsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+AVvl+qAAAAmnRSTlMACCEwMSQLU7Lh7u/kvGEND471+qEWBIP8lgcBBgI56vJFAwpBjLS5YoaRGGSmwLuTRwmV8cnY3Mr99JsarJRA8POKuMGfp2D+ZxfG++nQHTZ/03YoUuWcSutoj4GeDFU/3vlfsd/tPiAr29klLux1QjNDY0TNauMjG7ZZ95cTjYsSclba3Rn2y6K6tZiasJkRVIA7PYiEV+Ii/GQDnQAAAmZJREFUWMNjYBgFo4DmgJGJmYWVjXzt7BycXNw8vHz85OkXEBSaBQbCIqLk6BcTl5gFA5JSJGmVlpGSZWCQk4frn6WgyMCgpMwoTZR2KRVVNXURDVHNWUhAS1tHV0/fwNCIsH5tYxOQDglTM2QDzC0sQZSVtQ1B/baz8AIOAibI2M0iAKwZ8Rpg70DIAEdDvAY4zSIIDPD6gIOwAfr4/CDlTNgAF3x5Q9aVsAFuSvj84C5BSL+HJ95A9PLGrs3HF5qxZvn548s/AYFBWPU7BIeEmkOYYeEROENRQDwSu/0OUUB/B8J4VpI4cjdjtAQe/QwxCIHYOKwGxAvh05+QiBBJSsbqgBRkXaneaSj601Eypzq2tJCRiqTCO5MtIgtZfzaKo3hysBiQm4ekIh8oUGCOS/8sh0JCBhiAtBWZw/yfPYsIA5g4kVRwF4M0lpSWYdU/q7wCiwFGashKuEAmyFbKYNU/qwpr2Vhdg2ECA3b9NdVY04FyrQcWE7Do95BUxp4U6+odMEzAop+7oRFngWQvaI5sQlNIcwu69lbBBBk8+bHNFFmxsG87hv0dbXjLAw1LQgWKZTE+/bIihIu0Tll8LYIuwgbw4iuVZboJG1CFt6qvJ2xANN5ALDIhpB/UVMBXs/RgL8sRzF78lSuDTR/2yINX75WEGgg2/Y7gBoZFFrIBZnpJ4FQsaUO4icJYJFjF21ns1YBsgNOEiVq2upMmSxHZyGIEZqMpaQj9kZOBomJK0qQ186bCPW45TYychuIEA2gJ0x4tQF5TVXl6d7mDwwwOdkayW8tGFYWFM8nXPgpGAdEAAEP98qSOUjrNAAAAAElFTkSuQmCC" alt="">
       Valider ce passage
     </button>
   </div>
@@ -601,12 +614,48 @@ function isInParis(lat, lng) {
          lng >= PARIS_BOUNDS.west && lng <= PARIS_BOUNDS.east;
 }
 
-function startApp() {
+let demoMode = false;
+
+function startApp(demo) {
+  demoMode = !!demo;
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   initMap();
-  startGPS();
+  if (demoMode) {
+    startDemoMode();
+  } else {
+    startGPS();
+  }
   loadParisTotal();
+}
+
+function startDemoMode() {
+  document.getElementById('gps-text').textContent = 'Mode démo';
+  document.getElementById('gps-dot').classList.add('active');
+  showToast('Mode démo : déplace la carte pour explorer Paris');
+
+  // Position de départ : centre de Paris (Notre-Dame)
+  const startLat = 48.8530, startLng = 2.3499;
+  currentPos = { lat: startLat, lng: startLng };
+  playerMarker.setLatLng([startLat, startLng]);
+  map.setView([startLat, startLng], 17);
+  loadCrosswalksNear(startLat, startLng);
+  lastLoadPos = { lat: startLat, lng: startLng };
+
+  // En mode démo, la position "joueur" suit le centre de la carte qu'on déplace à la main
+  map.on('move', () => {
+    const center = map.getCenter();
+    currentPos = { lat: center.lat, lng: center.lng };
+    playerMarker.setLatLng([center.lat, center.lng]);
+    updateNearby();
+  });
+  map.on('moveend', () => {
+    const center = map.getCenter();
+    if (!lastLoadPos || distM(center.lat, center.lng, lastLoadPos.lat, lastLoadPos.lng) > LOAD_RADIUS * 0.5) {
+      loadCrosswalksNear(center.lat, center.lng);
+      lastLoadPos = { lat: center.lat, lng: center.lng };
+    }
+  });
 }
 
 function initMap() {
@@ -815,7 +864,9 @@ function updateNearby() {
     if (div) div.classList.toggle('nearby', isNear);
   });
   document.getElementById('s-nearby').textContent = nearbyIds.length;
-  document.getElementById('collect-btn').disabled = nearbyIds.length === 0;
+  const isActive = nearbyIds.length > 0;
+  document.getElementById('collect-btn').disabled = !isActive;
+  document.getElementById('collect-btn-icon').src = isActive ? 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAQAAAAAYLlVAAADVElEQVRo3u2YS2xMURzGv5mO29vSjEc8Oo2EiGQSiY1EglDxiKRqJYiFCDZiKawsREhIRC1Qr0Rib0FTTYSFWjTxSiQ2LUU84k2HotpqfxZtxtTMvXPuudfYzLebOef+v+88/o/zl8ooo4wy/jNidp8hSa5qlVRMvXqj79am7OhxWU8Lz/lMD6+4wTZqGJFVEvokTXwnFwNcZBolok9wkF/ko5lK/hlpDIdK4gixiPcUwldWI0QF1bjEzMQkDK5bpRZrrdIap7dqV6vWaWrBqTVq1EM1aoVSGlSnWrmlvljIlYsZnOJLdpW/uE0nXujmDkPZX984TyrU1UTM4BJh0BJCAsLhJGFxHtdewHIyoQX0ssZvD+K+sa5BydAuNEGNfsNxnzFH6Ui8OC3XTkBMTiQCHFXYCRjUm0gEvNZPOwHDatdQBGH0pqUVxHQ6At34Qd79laTgATMJfgkRCS3UTtUEUPxF+1SvLXoy5t+p2q+GgLEAkeQgHwKtPsNOKhBif97YN5qZZhwRES7HCyZcE3pxoOCMC0zAOAFtyDtJc/p6nhac089Woz1AuFzxpHpGB5986Jf55MprjDcTMItnHiY6mMd4GnjsSd/ls0+vmGsmYD4fPUzsHSVaQXdgesiwIKyAE1mylXTnnX1X0ZtiKGA2zz1M9LAjS7iK++wKQA8vmWMmoIpWTyOfsxLi1OEEoIc2qjB0w830FZOQM9uMvo/NhqEIUc1photLCEA/TDPVBAjFUzjmU479OQgz+h6OMjloNnBYTlPW3fIl7CbNRh4VJX9CE/U4WKXjWm57Gh7gHT8MVn+XWiyrAbE955lhiyF2WFXFkuKq9x03QxEr/lVxbSQ1YcqvuPWvCQcjETDg5/5x3w87IxHQpX4LATFJatPX0PS9arPsHyEqORPgvheOneesH6cSIsXlQC6X/zyvC9cfECnO0pvToLgzph4ai05u0p8TgJuLdwdixUXI1RKtVVqOXqtdrdqjPR6Tj+qwVmqp6jSgR7que+qPpHs42qRyRxPQ0ryydAQfWMLI3AQVpk0quzbdkQKnPcQhEqXqFE7ixF8lyw+OkyxRp3S0ZNnEVV6SIcMLWlhv62xhmtVVSmmipJ6RDkAJm9VllFFGGVHiN/8e6tgDxdZrAAAAAElFTkSuQmCC' : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAB0VBMVEUAAABsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+AVvl+qAAAAmnRSTlMACCEwMSQLU7Lh7u/kvGEND471+qEWBIP8lgcBBgI56vJFAwpBjLS5YoaRGGSmwLuTRwmV8cnY3Mr99JsarJRA8POKuMGfp2D+ZxfG++nQHTZ/03YoUuWcSutoj4GeDFU/3vlfsd/tPiAr29klLux1QjNDY0TNauMjG7ZZ95cTjYsSclba3Rn2y6K6tZiasJkRVIA7PYiEV+Ii/GQDnQAAAmZJREFUWMNjYBgFo4DmgJGJmYWVjXzt7BycXNw8vHz85OkXEBSaBQbCIqLk6BcTl5gFA5JSJGmVlpGSZWCQk4frn6WgyMCgpMwoTZR2KRVVNXURDVHNWUhAS1tHV0/fwNCIsH5tYxOQDglTM2QDzC0sQZSVtQ1B/baz8AIOAibI2M0iAKwZ8Rpg70DIAEdDvAY4zSIIDPD6gIOwAfr4/CDlTNgAF3x5Q9aVsAFuSvj84C5BSL+HJ95A9PLGrs3HF5qxZvn548s/AYFBWPU7BIeEmkOYYeEROENRQDwSu/0OUUB/B8J4VpI4cjdjtAQe/QwxCIHYOKwGxAvh05+QiBBJSsbqgBRkXaneaSj601Eypzq2tJCRiqTCO5MtIgtZfzaKo3hysBiQm4ekIh8oUGCOS/8sh0JCBhiAtBWZw/yfPYsIA5g4kVRwF4M0lpSWYdU/q7wCiwFGashKuEAmyFbKYNU/qwpr2Vhdg2ECA3b9NdVY04FyrQcWE7Do95BUxp4U6+odMEzAop+7oRFngWQvaI5sQlNIcwu69lbBBBk8+bHNFFmxsG87hv0dbXjLAw1LQgWKZTE+/bIihIu0Tll8LYIuwgbw4iuVZboJG1CFt6qvJ2xANN5ALDIhpB/UVMBXs/RgL8sRzF78lSuDTR/2yINX75WEGgg2/Y7gBoZFFrIBZnpJ4FQsaUO4icJYJFjF21ns1YBsgNOEiVq2upMmSxHZyGIEZqMpaQj9kZOBomJK0qQ186bCPW45TYychuIEA2gJ0x4tQF5TVXl6d7mDwwwOdkayW8tGFYWFM8nXPgpGAdEAAEP98qSOUjrNAAAAAElFTkSuQmCC';
 }
 
 function collectNearby() {
