@@ -1205,9 +1205,6 @@ function closeBottomSheet() {
   bottomEl.classList.remove('expanded');
   if (closeBtn) closeBtn.classList.remove('show');
 }
-  if (!bottomEl) return;
-  bottomEl.classList.remove('expanded');
-}
 
 function setupBottomSwipe() {
   const handleEl = document.getElementById('bottom-handle');
