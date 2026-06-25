@@ -245,6 +245,19 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   overflow-y: auto;
   transition: max-height 0.3s ease;
 }
+#bottom.expanded {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: none;
+  height: 100%;
+  border-radius: 0;
+  z-index: 5000;
+  margin-top: 0;
+  padding-top: calc(20px + env(safe-area-inset-top));
+}
 #bottom-handle {
   width: 60px;
   height: 24px;
@@ -1159,23 +1172,17 @@ function getLevel(total) {
 function toggleBottomSheet() {
   const bottomEl = document.getElementById('bottom');
   if (!bottomEl) return;
-  if (bottomEl.classList.contains('expanded')) {
-    closeBottomSheet();
-  } else {
-    openBottomSheet();
-  }
+  bottomEl.classList.toggle('expanded');
 }
 function openBottomSheet() {
   const bottomEl = document.getElementById('bottom');
   if (!bottomEl) return;
   bottomEl.classList.add('expanded');
-  bottomEl.style.setProperty('max-height', '600px', 'important');
 }
 function closeBottomSheet() {
   const bottomEl = document.getElementById('bottom');
   if (!bottomEl) return;
   bottomEl.classList.remove('expanded');
-  bottomEl.style.setProperty('max-height', '160px', 'important');
 }
 
 function setupBottomSwipe() {
