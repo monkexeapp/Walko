@@ -566,7 +566,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
         <div id="progress-bar-fill"></div>
       </div>
       <div id="level-text">niv <strong id="level-num">1</strong></div>
-      <div id="burger-btn" onclick="alert('burger clické'); toggleBottomSheet()">
+      <div id="burger-btn" onclick="toggleBottomSheet()">
         <span></span><span></span><span></span>
       </div>
     </div>
@@ -1181,13 +1181,13 @@ function openBottomSheet() {
   const bottomEl = document.getElementById('bottom');
   if (!bottomEl) return;
   bottomEl.classList.add('expanded');
-  bottomEl.style.maxHeight = (window.innerHeight - 90) + 'px';
+  bottomEl.style.setProperty('max-height', '600px', 'important');
 }
 function closeBottomSheet() {
   const bottomEl = document.getElementById('bottom');
   if (!bottomEl) return;
   bottomEl.classList.remove('expanded');
-  bottomEl.style.maxHeight = '160px';
+  bottomEl.style.setProperty('max-height', '160px', 'important');
 }
 
 function setupBottomSwipe() {
