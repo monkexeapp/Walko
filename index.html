@@ -150,19 +150,6 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   font-weight: 800;
   font-size: 15px;
 }
-#header-close-btn {
-  display: none;
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  color: var(--white);
-  cursor: pointer;
-  margin-left: auto;
-}
-#header-close-btn.show { display: flex; }
 #progress-detail {
   color: rgba(255,255,255,0.75);
   font-size: 8.5px;
@@ -248,40 +235,12 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 #bottom {
   background: var(--white);
   border-radius: 18px 18px 0 0;
-  padding: 8px 14px calc(6px + env(safe-area-inset-bottom));
+  padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
   box-shadow: 0 -8px 24px rgba(76,47,184,0.10);
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 800;
-  height: calc(100% - var(--header-height, 140px));
-  overflow-y: auto;
-  transform: translateY(calc(100% - 160px));
-  transition: transform 0.3s ease;
-}
-#bottom.expanded {
-  transform: translateY(0);
-}
-#bottom.dragging {
-  transition: none;
-}
-#bottom-handle {
-  width: 60px;
-  height: 24px;
-  margin: -8px auto 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  touch-action: none;
-}
-#bottom-handle::after {
-  content: '';
-  width: 36px;
-  height: 4px;
-  background: var(--line);
-  border-radius: 4px;
+  z-index: 200;
+  flex-shrink: 0;
+  margin-top: 6px;
+  position: relative;
 }
 #bottom-extra {
   margin-top: 14px;
@@ -577,7 +536,6 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
         <div id="progress-bar-fill"></div>
       </div>
       <div id="level-text">niv <strong id="level-num">1</strong></div>
-      <div id="header-close-btn" onclick="closeBottomSheet()">✕</div>
     </div>
     <div id="progress-detail">0 / — passages validés</div>
   </div>
@@ -590,7 +548,6 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   </div>
 
   <div id="bottom">
-    <div id="bottom-handle"></div>
     <div id="stats-row">
       <div class="stat-card">
         <div class="stat-icon-wrap"><img class="stat-icon icon-valid" src="data:image/png;base64,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" alt=""></div>
@@ -680,7 +637,6 @@ function startApp(demo) {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('app').style.display = 'flex';
   initMap();
-  setupBottomSwipe();
   if (demoMode) {
     startDemoMode();
   } else {
@@ -1175,106 +1131,6 @@ function getLevel(total) {
     level = LEVEL_THRESHOLDS.length + extra;
   }
   return level;
-}
-
-/* ===== BOTTOM SHEET draggable, suit le doigt en temps réel ===== */
-let bottomCollapsedY = 160;   // hauteur visible quand replié (px)
-let bottomDragStartY = null;
-let bottomStartTranslate = 0;
-let bottomElHeight = 0;
-
-function getBottomEl() { return document.getElementById('bottom'); }
-
-function updateHeaderHeightVar() {
-  const headerEl = document.getElementById('header');
-  if (headerEl) {
-    document.documentElement.style.setProperty('--header-height', headerEl.offsetHeight + 'px');
-  }
-}
-
-function toggleBottomSheet() {
-  const bottomEl = getBottomEl();
-  if (!bottomEl) return;
-  if (bottomEl.classList.contains('expanded')) {
-    closeBottomSheet();
-  } else {
-    openBottomSheet();
-  }
-}
-
-function openBottomSheet() {
-  const bottomEl = getBottomEl();
-  const closeBtn = document.getElementById('header-close-btn');
-  if (!bottomEl) return;
-  updateHeaderHeightVar();
-  bottomEl.style.transform = '';
-  bottomEl.classList.add('expanded');
-  if (closeBtn) closeBtn.classList.add('show');
-}
-
-function closeBottomSheet() {
-  const bottomEl = getBottomEl();
-  const closeBtn = document.getElementById('header-close-btn');
-  if (!bottomEl) return;
-  bottomEl.style.transform = '';
-  bottomEl.classList.remove('expanded');
-  if (closeBtn) closeBtn.classList.remove('show');
-}
-
-function setupBottomSwipe() {
-  const handleEl = document.getElementById('bottom-handle');
-  const bottomEl = getBottomEl();
-  if (!handleEl || !bottomEl) return;
-
-  updateHeaderHeightVar();
-  window.addEventListener('resize', updateHeaderHeightVar);
-
-  let dragged = false;
-
-  handleEl.addEventListener('touchstart', (e) => {
-    bottomDragStartY = e.touches[0].clientY;
-    bottomElHeight = bottomEl.offsetHeight;
-    dragged = false;
-    bottomEl.classList.add('dragging');
-    bottomStartTranslate = bottomEl.classList.contains('expanded') ? 0 : (bottomElHeight - bottomCollapsedY);
-  }, { passive: true });
-
-  handleEl.addEventListener('touchmove', (e) => {
-    if (bottomDragStartY === null) return;
-    e.preventDefault();
-    const deltaY = e.touches[0].clientY - bottomDragStartY; // positif = doigt descend
-    if (Math.abs(deltaY) > 6) dragged = true;
-    let translate = bottomStartTranslate + deltaY;
-    const maxTranslate = bottomElHeight - bottomCollapsedY;
-    if (translate < 0) translate = 0;
-    if (translate > maxTranslate) translate = maxTranslate;
-    bottomEl.style.transform = `translateY(${translate}px)`;
-  }, { passive: false });
-
-  handleEl.addEventListener('touchend', (e) => {
-    if (bottomDragStartY === null) return;
-    bottomEl.classList.remove('dragging');
-    bottomEl.style.transform = '';
-
-    if (!dragged) {
-      // Simple tap, sans glissement notable : on bascule l'état
-      toggleBottomSheet();
-    } else {
-      const lastY = e.changedTouches[0].clientY;
-      const deltaY = lastY - bottomDragStartY;
-      const maxTranslate = bottomElHeight - bottomCollapsedY;
-      let translate = bottomStartTranslate + deltaY;
-      if (translate < 0) translate = 0;
-      if (translate > maxTranslate) translate = maxTranslate;
-
-      if (translate < maxTranslate / 2) {
-        openBottomSheet();
-      } else {
-        closeBottomSheet();
-      }
-    }
-    bottomDragStartY = null;
-  }, { passive: true });
 }
 
 function getSaved() {
