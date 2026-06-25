@@ -250,25 +250,21 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   border-radius: 18px 18px 0 0;
   padding: 8px 14px calc(6px + env(safe-area-inset-bottom));
   box-shadow: 0 -8px 24px rgba(76,47,184,0.10);
-  z-index: 200;
-  flex-shrink: 0;
-  margin-top: 4px;
-  position: relative;
-  max-height: 160px;
-  overflow-y: auto;
-  transition: max-height 0.3s ease;
-}
-#bottom.expanded {
   position: fixed;
-  top: var(--header-height, 140px);
   left: 0;
   right: 0;
   bottom: 0;
-  max-height: none;
-  height: auto;
-  border-radius: 0;
-  z-index: 5000;
-  margin-top: 0;
+  z-index: 800;
+  height: calc(100% - var(--header-height, 140px));
+  overflow-y: auto;
+  transform: translateY(calc(100% - 160px));
+  transition: transform 0.3s ease;
+}
+#bottom.expanded {
+  transform: translateY(0);
+}
+#bottom.dragging {
+  transition: none;
 }
 #bottom-handle {
   width: 60px;
@@ -1181,65 +1177,104 @@ function getLevel(total) {
   return level;
 }
 
-/* ===== BOTTOM SHEET extensible (burger + swipe-up + swipe-down) ===== */
-function toggleBottomSheet() {
-  const bottomEl = document.getElementById('bottom');
-  if (!bottomEl) return;
-  bottomEl.classList.toggle('expanded');
-}
-function openBottomSheet() {
-  const bottomEl = document.getElementById('bottom');
+/* ===== BOTTOM SHEET draggable, suit le doigt en temps réel ===== */
+let bottomCollapsedY = 160;   // hauteur visible quand replié (px)
+let bottomDragStartY = null;
+let bottomStartTranslate = 0;
+let bottomElHeight = 0;
+
+function getBottomEl() { return document.getElementById('bottom'); }
+
+function updateHeaderHeightVar() {
   const headerEl = document.getElementById('header');
-  const closeBtn = document.getElementById('header-close-btn');
-  if (!bottomEl) return;
   if (headerEl) {
     document.documentElement.style.setProperty('--header-height', headerEl.offsetHeight + 'px');
   }
+}
+
+function toggleBottomSheet() {
+  const bottomEl = getBottomEl();
+  if (!bottomEl) return;
+  if (bottomEl.classList.contains('expanded')) {
+    closeBottomSheet();
+  } else {
+    openBottomSheet();
+  }
+}
+
+function openBottomSheet() {
+  const bottomEl = getBottomEl();
+  const closeBtn = document.getElementById('header-close-btn');
+  if (!bottomEl) return;
+  updateHeaderHeightVar();
+  bottomEl.style.transform = '';
   bottomEl.classList.add('expanded');
   if (closeBtn) closeBtn.classList.add('show');
 }
+
 function closeBottomSheet() {
-  const bottomEl = document.getElementById('bottom');
+  const bottomEl = getBottomEl();
   const closeBtn = document.getElementById('header-close-btn');
   if (!bottomEl) return;
+  bottomEl.style.transform = '';
   bottomEl.classList.remove('expanded');
   if (closeBtn) closeBtn.classList.remove('show');
 }
 
 function setupBottomSwipe() {
   const handleEl = document.getElementById('bottom-handle');
-  const bottomEl = document.getElementById('bottom');
+  const bottomEl = getBottomEl();
   if (!handleEl || !bottomEl) return;
-  let startY = null;
-  let moved = false;
+
+  updateHeaderHeightVar();
+  window.addEventListener('resize', updateHeaderHeightVar);
+
+  let dragged = false;
 
   handleEl.addEventListener('touchstart', (e) => {
-    startY = e.touches[0].clientY;
-    moved = false;
+    bottomDragStartY = e.touches[0].clientY;
+    bottomElHeight = bottomEl.offsetHeight;
+    dragged = false;
+    bottomEl.classList.add('dragging');
+    bottomStartTranslate = bottomEl.classList.contains('expanded') ? 0 : (bottomElHeight - bottomCollapsedY);
   }, { passive: true });
 
   handleEl.addEventListener('touchmove', (e) => {
-    if (startY === null) return;
+    if (bottomDragStartY === null) return;
     e.preventDefault();
-    const deltaY = startY - e.touches[0].clientY;
-    const isExpanded = bottomEl.classList.contains('expanded');
-    if (!isExpanded && deltaY > 30) {
-      openBottomSheet();
-      moved = true;
-    } else if (isExpanded && deltaY < -30) {
-      closeBottomSheet();
-      moved = true;
-    }
+    const deltaY = e.touches[0].clientY - bottomDragStartY; // positif = doigt descend
+    if (Math.abs(deltaY) > 6) dragged = true;
+    let translate = bottomStartTranslate + deltaY;
+    const maxTranslate = bottomElHeight - bottomCollapsedY;
+    if (translate < 0) translate = 0;
+    if (translate > maxTranslate) translate = maxTranslate;
+    bottomEl.style.transform = `translateY(${translate}px)`;
   }, { passive: false });
 
-  handleEl.addEventListener('touchend', () => {
-    startY = null;
-  }, { passive: true });
+  handleEl.addEventListener('touchend', (e) => {
+    if (bottomDragStartY === null) return;
+    bottomEl.classList.remove('dragging');
+    bottomEl.style.transform = '';
 
-  // Aussi un simple tap sur la poignée bascule l'état, en plus du swipe
-  handleEl.addEventListener('click', () => {
-    if (!moved) toggleBottomSheet();
-  });
+    if (!dragged) {
+      // Simple tap, sans glissement notable : on bascule l'état
+      toggleBottomSheet();
+    } else {
+      const lastY = e.changedTouches[0].clientY;
+      const deltaY = lastY - bottomDragStartY;
+      const maxTranslate = bottomElHeight - bottomCollapsedY;
+      let translate = bottomStartTranslate + deltaY;
+      if (translate < 0) translate = 0;
+      if (translate > maxTranslate) translate = maxTranslate;
+
+      if (translate < maxTranslate / 2) {
+        openBottomSheet();
+      } else {
+        closeBottomSheet();
+      }
+    }
+    bottomDragStartY = null;
+  }, { passive: true });
 }
 
 function getSaved() {
