@@ -157,7 +157,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 }
 #info-btn {
   position: absolute;
-  top: 58px;
+  top: 52px;
   right: 16px;
   width: 26px; height: 26px;
   background: var(--white);
@@ -550,7 +550,9 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 #info-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(26,21,48,0.55);
+  background: rgba(26,21,48,0.4);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -621,7 +623,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   font-weight: 600;
   cursor: pointer;
 }
-#info-reset-icon { font-size: 14px; }
+#info-reset-icon { width: 22px; height: 22px; }
 </style>
 </head>
 <body>
@@ -724,7 +726,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
     </p>
     <a id="info-portfolio-link" href="https://www.alexisbellay.fr/" target="_blank" rel="noopener noreferrer">Voir le portfolio →</a>
     <div id="info-reset-row" onclick="openResetModal()">
-      <span id="info-reset-icon">⟲</span>
+      <img id="info-reset-icon" src="data:image/png;base64,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" alt="">
       <span>Réinitialiser mon score</span>
     </div>
   </div>
