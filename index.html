@@ -169,7 +169,9 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   box-shadow: var(--shadow-card);
   z-index: 1;
 }
-#map { width: 100%; height: 100%; }
+#map { width: 142%; height: 142%; left: -21%; top: -21%; position: absolute; transform-origin: center center; }
+#map.rotating { transition: none; }
+#map:not(.rotating) { transition: transform 0.2s ease; }
 #map .leaflet-container { background: #ECE7FA; font-family: 'Poppins', sans-serif; }
 .leaflet-tile { filter: grayscale(0.3) brightness(1.05) sepia(0.15) hue-rotate(220deg) saturate(1.8) contrast(0.95); }
 
@@ -715,6 +717,47 @@ function initMap() {
     </div>`;
   const playerDiv = L.divIcon({ className: '', html: playerHtml, iconSize: [34,34], iconAnchor: [17,17] });
   playerMarker = L.marker([48.8566, 2.3522], { icon: playerDiv, zIndexOffset: 1000 }).addTo(map);
+
+  setupMapRotation();
+}
+
+let mapRotationDeg = 0;
+
+function setupMapRotation() {
+  const wrapEl = document.getElementById('map-wrap');
+  const mapEl = document.getElementById('map');
+  if (!wrapEl || !mapEl) return;
+
+  let startAngle = null;
+  let startRotation = 0;
+
+  function angleBetween(t0, t1) {
+    return Math.atan2(t1.clientY - t0.clientY, t1.clientX - t0.clientX) * (180 / Math.PI);
+  }
+
+  wrapEl.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      startAngle = angleBetween(e.touches[0], e.touches[1]);
+      startRotation = mapRotationDeg;
+      mapEl.classList.add('rotating');
+    }
+  }, { passive: true });
+
+  wrapEl.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2 && startAngle !== null) {
+      const currentAngle = angleBetween(e.touches[0], e.touches[1]);
+      const delta = currentAngle - startAngle;
+      mapRotationDeg = startRotation + delta;
+      mapEl.style.transform = `rotate(${mapRotationDeg}deg)`;
+    }
+  }, { passive: true });
+
+  wrapEl.addEventListener('touchend', (e) => {
+    if (e.touches.length < 2) {
+      startAngle = null;
+      mapEl.classList.remove('rotating');
+    }
+  }, { passive: true });
 }
 
 function startGPS() {
