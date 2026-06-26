@@ -622,18 +622,11 @@ let nearbyIds = [];
 const RADIUS_M = 35;
 const LOAD_RADIUS = 700;
 let lastLoadPos = null;
-let parisTotalCount = null;
-let parisTotalLoading = false;
+const SCORE_MAX = 200000; // objectif fixe : 200 000 passages = niveau 100 = 100%
 let modalTargetId = null; // id du passage concerné par le modal ouvert
 
-// Bounding box stricte de Paris intra-muros (pour exclure la banlieue)
-const PARIS_BOUNDS = { south: 48.8156, west: 2.2241, north: 48.9022, east: 2.4699 };
-const PARIS_BBOX = `${PARIS_BOUNDS.south},${PARIS_BOUNDS.west},${PARIS_BOUNDS.north},${PARIS_BOUNDS.east}`;
-
-function isInParis(lat, lng) {
-  return lat >= PARIS_BOUNDS.south && lat <= PARIS_BOUNDS.north &&
-         lng >= PARIS_BOUNDS.west && lng <= PARIS_BOUNDS.east;
-}
+// Bounding box de la France métropolitaine (pour le calcul du score, optionnel)
+const FRANCE_BOUNDS = { south: 41.0, west: -5.5, north: 51.5, east: 9.8 };
 
 let demoMode = false;
 
@@ -647,7 +640,7 @@ function startApp(demo) {
   } else {
     startGPS();
   }
-  loadParisTotal();
+  refreshCounts();
 }
 
 function startDemoMode() {
@@ -937,18 +930,12 @@ function onGPSError(err) {
 }
 
 async function loadCrosswalksNear(lat, lng) {
-  // Si le centre visé est hors de Paris, on ne charge rien à cet endroit
-  // (mais on n'affiche pas de toast : l'utilisateur explore peut-être la carte vers Paris)
-  if (!isInParis(lat, lng)) {
-    return;
-  }
-
   const d = 0.0063;
-  // On limite la zone de requête à l'intersection avec Paris intra-muros
-  const south = Math.max(lat - d, PARIS_BOUNDS.south);
-  const west = Math.max(lng - d, PARIS_BOUNDS.west);
-  const north = Math.min(lat + d, PARIS_BOUNDS.north);
-  const east = Math.min(lng + d, PARIS_BOUNDS.east);
+  // On limite la zone de requête à l'intersection avec la France métropolitaine
+  const south = Math.max(lat - d, FRANCE_BOUNDS.south);
+  const west = Math.max(lng - d, FRANCE_BOUNDS.west);
+  const north = Math.min(lat + d, FRANCE_BOUNDS.north);
+  const east = Math.min(lng + d, FRANCE_BOUNDS.east);
   const bbox = `${south},${west},${north},${east}`;
 
   const query = `[out:json][timeout:15];node["highway"="crossing"](${bbox});out body;`;
@@ -969,7 +956,6 @@ function processCrosswalks(elements) {
 
   elements.forEach(el => {
     if (!el.lat || !el.lon) return;
-    if (!isInParis(el.lat, el.lon)) return; // double sécurité : on ignore tout hors Paris
     const id = String(el.id);
     if (crosswalks.has(id)) return;
 
@@ -1137,44 +1123,15 @@ function refreshCounts() {
   const saved = getSaved();
   document.getElementById('s-collected').textContent = saved.length;
 
-  let remaining = '—';
-  let pct = 0;
-  if (parisTotalCount) {
-    remaining = Math.max(parisTotalCount - saved.length, 0);
-    pct = Math.min(Math.round((saved.length / parisTotalCount) * 100), 100);
-  }
+  const remaining = Math.max(SCORE_MAX - saved.length, 0);
+  const pct = Math.min(Math.round((saved.length / SCORE_MAX) * 100), 100);
+
   document.getElementById('s-total').textContent = remaining;
   document.getElementById('progress-bar-fill').style.width = pct + '%';
-  document.getElementById('progress-detail').textContent =
-    parisTotalCount ? `${saved.length} / ${parisTotalCount} passages validés` : `${saved.length} passages validés`;
+  document.getElementById('progress-detail').textContent = `${saved.length} / ${SCORE_MAX} passages validés`;
 
   const level = getLevel(saved.length);
   document.getElementById('level-num').textContent = level;
-}
-
-async function loadParisTotal() {
-  if (parisTotalLoading) return;
-  parisTotalLoading = true;
-  document.getElementById('progress-detail').textContent = 'Calcul...';
-
-  const query = `[out:json][timeout:25];node["highway"="crossing"](${PARIS_BBOX});out count;`;
-  const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-
-  try {
-    const res = await fetch(url);
-    const data = await res.json();
-    const count = data.elements && data.elements[0] && data.elements[0].tags
-      ? parseInt(data.elements[0].tags.total)
-      : null;
-    if (count) {
-      parisTotalCount = count;
-      refreshCounts();
-    }
-  } catch(e) {
-    // silencieux, on retentera plus tard
-  } finally {
-    parisTotalLoading = false;
-  }
 }
 
 function recenter() {
@@ -1230,19 +1187,37 @@ function resetAll() {
   showToast('Tous les passages ont été réinitialisés');
 }
 
-// Paliers de niveaux : niveau 1 = départ, niveau 2 dès le premier passage, puis paliers suivants
-const LEVEL_THRESHOLDS = [0, 1, 10, 50, 100, 500, 1000, 1100, 1500, 2000, 2100];
+// Système de niveaux crescendo : niveau 1 = 0 passage, niveau 2 = 1 passage (le premier validé),
+// puis les niveaux 3 à 100 suivent une courbe en puissance qui rend chaque niveau plus difficile
+// à atteindre que le précédent, jusqu'à exactement 200 000 passages pour le niveau 100.
+const MAX_LEVEL = 100;
+const LEVEL_CURVE_POWER = 2.2; // > 1 = accélère la difficulté vers la fin
+
+function buildLevelThresholds() {
+  const thresholds = [0, 1]; // niveau 1 -> 0, niveau 2 -> 1
+  for (let n = 3; n <= MAX_LEVEL; n++) {
+    let value;
+    if (n === MAX_LEVEL) {
+      value = SCORE_MAX; // le dernier niveau correspond exactement à l'objectif final
+    } else {
+      const ratio = n / MAX_LEVEL;
+      value = Math.round(SCORE_MAX * Math.pow(ratio, LEVEL_CURVE_POWER));
+    }
+    // on garantit une progression strictement croissante même si la courbe stagne par endroits
+    value = Math.max(value, thresholds[thresholds.length - 1] + 1);
+    thresholds.push(value);
+  }
+  return thresholds;
+}
+
+const LEVEL_THRESHOLDS = buildLevelThresholds(); // index 0 = niveau 1, index 1 = niveau 2, etc.
+
 function getLevel(total) {
   let level = 1;
   for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
     if (total >= LEVEL_THRESHOLDS[i]) level = i + 1;
   }
-  // Au-delà du dernier palier défini, on continue à monter de niveau tous les 500
-  if (total > LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1]) {
-    const extra = Math.floor((total - LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1]) / 500);
-    level = LEVEL_THRESHOLDS.length + extra;
-  }
-  return level;
+  return Math.min(level, MAX_LEVEL);
 }
 
 function getSaved() {
