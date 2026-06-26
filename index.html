@@ -176,30 +176,9 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 .leaflet-tile { filter: grayscale(0.3) brightness(1.05) sepia(0.15) hue-rotate(220deg) saturate(1.8) contrast(0.95); }
 
 .player-icon-wrap {
-  width: 340px; height: 340px;
+  width: 34px; height: 34px;
   display: flex; align-items: center; justify-content: center;
   position: relative;
-  pointer-events: none;
-}
-.radar-glow {
-  position: absolute;
-  width: 100%; height: 100%;
-  border-radius: 50%;
-  border: 6px solid rgba(108,79,224,0.45);
-  background: radial-gradient(circle, rgba(108,79,224,0.10) 0%, rgba(108,79,224,0.04) 70%, rgba(108,79,224,0) 100%);
-  filter: blur(6px);
-  animation: radarBreathe 3.2s ease-in-out infinite;
-}
-.radar-circle {
-  position: absolute;
-  width: 100%; height: 100%;
-  border-radius: 50%;
-  border: 1.5px solid rgba(108,79,224,0.75);
-  animation: radarBreathe 3.2s ease-in-out infinite;
-}
-@keyframes radarBreathe {
-  0%, 100% { transform: scale(0.94); opacity: 0.85; }
-  50% { transform: scale(1.04); opacity: 1; }
 }
 .player-icon-halo {
   position: absolute;
@@ -213,6 +192,9 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   transition: transform 0.35s ease;
   transform-origin: 50% 50%;
   filter: drop-shadow(0 2px 4px rgba(76,47,184,0.35));
+}
+.radar-leaflet-circle {
+  filter: drop-shadow(0 0 6px rgba(108,79,224,0.7)) drop-shadow(0 0 12px rgba(108,79,224,0.4));
 }
 
 .cw-marker {
@@ -677,6 +659,7 @@ function startDemoMode() {
   const startLat = 48.8530, startLng = 2.3499;
   currentPos = { lat: startLat, lng: startLng };
   playerMarker.setLatLng([startLat, startLng]);
+  radarCircle.setLatLng([startLat, startLng]);
   map.setView([startLat, startLng], 17);
   loadCrosswalksNear(startLat, startLng);
   lastLoadPos = { lat: startLat, lng: startLng };
@@ -686,6 +669,7 @@ function startDemoMode() {
     const center = map.getCenter();
     currentPos = { lat: center.lat, lng: center.lng };
     playerMarker.setLatLng([center.lat, center.lng]);
+    radarCircle.setLatLng([center.lat, center.lng]);
     updateNearby();
   });
   map.on('moveend', () => {
@@ -732,17 +716,26 @@ function initMap() {
 
   const playerHtml = `
     <div class="player-icon-wrap">
-      <div class="radar-glow"></div>
-      <div class="radar-circle"></div>
       <div class="player-icon-halo"></div>
       <svg class="player-arrow" id="player-arrow-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2 L19 21 L12 16.5 L5 21 Z" fill="#6C4FE0" stroke="#ffffff" stroke-width="1.2" stroke-linejoin="round"/>
       </svg>
     </div>`;
-  const playerDiv = L.divIcon({ className: '', html: playerHtml, iconSize: [340,340], iconAnchor: [170,170] });
+  const playerDiv = L.divIcon({ className: '', html: playerHtml, iconSize: [34,34], iconAnchor: [17,17] });
   playerMarker = L.marker([48.8566, 2.3522], { icon: playerDiv, zIndexOffset: 1000 }).addTo(map);
 
-  radarCircle = null;
+  radarCircle = L.circle([48.8566, 2.3522], {
+    radius: RADIUS_M,
+    className: 'radar-leaflet-circle',
+    color: '#6C4FE0',
+    weight: 1.5,
+    opacity: 0.75,
+    fillColor: '#6C4FE0',
+    fillOpacity: 0.08,
+    interactive: false
+  }).addTo(map);
+
+  startRadarBreathing();
 
   setupMapGestures();
 }
@@ -816,6 +809,23 @@ function setupMapGestures() {
       panLastPoint = null;
     }
   }, { passive: true });
+}
+
+function startRadarBreathing() {
+  const baseRadius = RADIUS_M;
+  const amplitude = RADIUS_M * 0.12; // légère variation de +/- 12%
+  const durationMs = 3200;
+  const startTime = Date.now();
+
+  function tick() {
+    if (!radarCircle) return;
+    const elapsed = (Date.now() - startTime) % durationMs;
+    const phase = (elapsed / durationMs) * Math.PI * 2;
+    const radius = baseRadius + Math.sin(phase) * amplitude;
+    radarCircle.setRadius(radius);
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
 }
 
 function startGPS() {
@@ -900,6 +910,7 @@ function onPosition(pos) {
   document.getElementById('gps-dot').classList.add('active');
 
   playerMarker.setLatLng([lat, lng]);
+  radarCircle.setLatLng([lat, lng]);
 
   // Fallback : si la boussole magnétique n'a pas encore donné de cap fiable,
   // on utilise le cap de déplacement du GPS (disponible seulement en mouvement)
