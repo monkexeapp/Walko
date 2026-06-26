@@ -181,14 +181,20 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   position: relative;
   pointer-events: none;
 }
+.radar-glow {
+  position: absolute;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  border: 6px solid rgba(108,79,224,0.45);
+  background: radial-gradient(circle, rgba(108,79,224,0.10) 0%, rgba(108,79,224,0.04) 70%, rgba(108,79,224,0) 100%);
+  filter: blur(6px);
+  animation: radarBreathe 3.2s ease-in-out infinite;
+}
 .radar-circle {
   position: absolute;
   width: 100%; height: 100%;
   border-radius: 50%;
-  border: 2px solid rgba(108,79,224,0.55);
-  background: radial-gradient(circle, rgba(108,79,224,0.10) 0%, rgba(108,79,224,0.04) 70%, rgba(108,79,224,0) 100%);
-  box-shadow: 0 0 18px 4px rgba(108,79,224,0.35), inset 0 0 18px 4px rgba(108,79,224,0.25);
-  filter: blur(1.5px);
+  border: 1.5px solid rgba(108,79,224,0.75);
   animation: radarBreathe 3.2s ease-in-out infinite;
 }
 @keyframes radarBreathe {
@@ -699,7 +705,8 @@ function initMap() {
     dragging: false,
     touchZoom: true,
     scrollWheelZoom: true,
-    doubleClickZoom: true
+    doubleClickZoom: true,
+    markerZoomAnimation: false
   }).setView([48.8566, 2.3522], 17);
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
@@ -725,6 +732,7 @@ function initMap() {
 
   const playerHtml = `
     <div class="player-icon-wrap">
+      <div class="radar-glow"></div>
       <div class="radar-circle"></div>
       <div class="player-icon-halo"></div>
       <svg class="player-arrow" id="player-arrow-svg" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
