@@ -601,7 +601,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 </div>
 
 <script>
-let map, playerMarker;
+let map, playerMarker, radarCircle;
 let followMode = true; // tant que true, la carte suit la position GPS automatiquement
 
 // Fix hauteur réelle viewport pour Safari iOS (barre d'adresse dynamique)
@@ -656,6 +656,7 @@ function startDemoMode() {
   const startLat = 48.8530, startLng = 2.3499;
   currentPos = { lat: startLat, lng: startLng };
   playerMarker.setLatLng([startLat, startLng]);
+  radarCircle.setLatLng([startLat, startLng]);
   map.setView([startLat, startLng], 17);
   loadCrosswalksNear(startLat, startLng);
   lastLoadPos = { lat: startLat, lng: startLng };
@@ -665,6 +666,7 @@ function startDemoMode() {
     const center = map.getCenter();
     currentPos = { lat: center.lat, lng: center.lng };
     playerMarker.setLatLng([center.lat, center.lng]);
+    radarCircle.setLatLng([center.lat, center.lng]);
     updateNearby();
   });
   map.on('moveend', () => {
@@ -717,6 +719,16 @@ function initMap() {
     </div>`;
   const playerDiv = L.divIcon({ className: '', html: playerHtml, iconSize: [34,34], iconAnchor: [17,17] });
   playerMarker = L.marker([48.8566, 2.3522], { icon: playerDiv, zIndexOffset: 1000 }).addTo(map);
+
+  radarCircle = L.circle([48.8566, 2.3522], {
+    radius: RADIUS_M,
+    color: '#6C4FE0',
+    weight: 1.5,
+    opacity: 0.5,
+    fillColor: '#6C4FE0',
+    fillOpacity: 0.08,
+    interactive: false
+  }).addTo(map);
 
   setupMapGestures();
 }
@@ -874,6 +886,7 @@ function onPosition(pos) {
   document.getElementById('gps-dot').classList.add('active');
 
   playerMarker.setLatLng([lat, lng]);
+  radarCircle.setLatLng([lat, lng]);
 
   // Fallback : si la boussole magnétique n'a pas encore donné de cap fiable,
   // on utilise le cap de déplacement du GPS (disponible seulement en mouvement)
