@@ -660,7 +660,7 @@ function startDemoMode() {
   currentPos = { lat: startLat, lng: startLng };
   playerMarker.setLatLng([startLat, startLng]);
   radarCircle.setLatLng([startLat, startLng]);
-  map.setView([startLat, startLng], 17);
+  map.setView([startLat, startLng], 18);
   loadCrosswalksNear(startLat, startLng);
   lastLoadPos = { lat: startLat, lng: startLng };
 
@@ -691,7 +691,7 @@ function initMap() {
     scrollWheelZoom: true,
     doubleClickZoom: true,
     markerZoomAnimation: false
-  }).setView([48.8566, 2.3522], 17);
+  }).setView([48.8566, 2.3522], 18);
 
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 19, subdomains: 'abcd', attribution: '© OSM © CARTO'
@@ -919,7 +919,7 @@ function onPosition(pos) {
   }
 
   if (!lastLoadPos || distM(lat, lng, lastLoadPos.lat, lastLoadPos.lng) > LOAD_RADIUS * 0.5) {
-    if (followMode) map.setView([lat, lng], 17, { animate: true, duration: 1 });
+    if (followMode) map.setView([lat, lng], 18, { animate: true, duration: 1 });
     loadCrosswalksNear(lat, lng);
     lastLoadPos = { lat, lng };
   } else if (followMode) {
@@ -1180,7 +1180,7 @@ async function loadParisTotal() {
 function recenter() {
   if (currentPos) {
     followMode = true;
-    map.setView([currentPos.lat, currentPos.lng], 17, { animate: true });
+    map.setView([currentPos.lat, currentPos.lng], 18, { animate: true });
   } else {
     showToast('Position GPS non disponible');
   }
