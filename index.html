@@ -6,7 +6,7 @@
 // Exécuté immédiatement, avant tout rendu
 // navigator.standalone = true UNIQUEMENT sur iOS en mode app installée
 if (window.navigator.standalone === true) {
-  document.write('<style>body,html{background:#ffffff!important}#app{background:linear-gradient(135deg,#4B2FB8 0%,#6C4FE0 60%,#8B6FE8 100%)!important}#header{padding-top:69px!important}#loading{padding-top:69px!important;bottom:-34px!important}#bottom{border-radius:18px 18px 0 0!important;padding-bottom:50px!important}#info-btn{top:110px!important}#modal-card{padding-bottom:60px!important}#info-overlay{padding-bottom:40px!important}</style>');
+  document.write('<style>#header{padding-top:69px!important}#loading{padding-top:69px!important}#info-btn{top:110px!important}</style>');
 }
 </script>
 
@@ -1128,35 +1128,23 @@ function onGPSError(err) {
 
 async function loadCrosswalksNear(lat, lng) {
   const d = 0.0063;
+  // On limite la zone de requête à l'intersection avec la France métropolitaine
   const south = Math.max(lat - d, FRANCE_BOUNDS.south);
   const west = Math.max(lng - d, FRANCE_BOUNDS.west);
   const north = Math.min(lat + d, FRANCE_BOUNDS.north);
   const east = Math.min(lng + d, FRANCE_BOUNDS.east);
   const bbox = `${south},${west},${north},${east}`;
 
-  const query = `[out:json][timeout:20];node["highway"="crossing"](${bbox});out body;`;
-  const encoded = encodeURIComponent(query);
+  const query = `[out:json][timeout:15];node["highway"="crossing"](${bbox});out body;`;
+  const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
 
-  // Plusieurs serveurs Overpass en fallback
-  const servers = [
-    `https://overpass-api.de/api/interpreter?data=${encoded}`,
-    `https://overpass.kumi.systems/api/interpreter?data=${encoded}`,
-    `https://maps.mail.ru/osm/tools/overpass/api/interpreter?data=${encoded}`,
-  ];
-
-  for (const url of servers) {
-    try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(15000) });
-      if (!res.ok) continue;
-      const data = await res.json();
-      processCrosswalks(data.elements || []);
-      return; // succès, on arrête
-    } catch(e) {
-      // Serveur indisponible, on essaie le suivant
-    }
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    processCrosswalks(data.elements || []);
+  } catch(e) {
+    showToast('Erreur réseau — recharge si besoin');
   }
-  // Tous les serveurs ont échoué
-  showToast('Erreur réseau — recharge si besoin');
 }
 
 function processCrosswalks(elements) {
