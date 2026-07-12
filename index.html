@@ -179,7 +179,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 }
 #info-btn {
   position: absolute;
-  top: 52px;
+  top: 100px;
   right: 16px;
   width: 26px; height: 26px;
   background: var(--white);
@@ -291,7 +291,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 #bottom {
   background: var(--white);
   border-radius: 18px 18px 0 0;
-  padding: 14px 14px calc(4px + env(safe-area-inset-bottom));
+  padding: 14px 14px 14px;
   box-shadow: 0 -8px 24px rgba(76,47,184,0.10);
   z-index: 200;
   flex-shrink: 0;
@@ -359,7 +359,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 /* ===== TOAST ===== */
 #toast {
   position: fixed;
-  top: 14px;
+  top: calc(80px + env(safe-area-inset-top, 0px));
   left: 50%;
   transform: translateX(-50%) translateY(-16px);
   background: var(--ink);
