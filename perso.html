@@ -828,16 +828,6 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
         <div class="stat-lbl">Restants</div>
       </div>
     </div>
-    <div id="stats-row-cv" style="display:flex; gap:6px; margin-bottom:8px;">
-      <div class="stat-card" style="background:#FEF0F0;">
-        <div class="stat-val" id="s-agencies" style="color:#E53935;">0</div>
-        <div class="stat-lbl">Agences</div>
-      </div>
-      <div class="stat-card" style="background:#F0FEF0;">
-        <div class="stat-val" id="s-cv" style="color:#2E7D32;">0</div>
-        <div class="stat-lbl">CV déposés</div>
-      </div>
-    </div>
     <button id="collect-btn" disabled onclick="collectNearby()">
       <img id="collect-btn-icon" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAB0VBMVEUAAABsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+BsT+AVvl+qAAAAmnRSTlMACCEwMSQLU7Lh7u/kvGEND471+qEWBIP8lgcBBgI56vJFAwpBjLS5YoaRGGSmwLuTRwmV8cnY3Mr99JsarJRA8POKuMGfp2D+ZxfG++nQHTZ/03YoUuWcSutoj4GeDFU/3vlfsd/tPiAr29klLux1QjNDY0TNauMjG7ZZ95cTjYsSclba3Rn2y6K6tZiasJkRVIA7PYiEV+Ii/GQDnQAAAmZJREFUWMNjYBgFo4DmgJGJmYWVjXzt7BycXNw8vHz85OkXEBSaBQbCIqLk6BcTl5gFA5JSJGmVlpGSZWCQk4frn6WgyMCgpMwoTZR2KRVVNXURDVHNWUhAS1tHV0/fwNCIsH5tYxOQDglTM2QDzC0sQZSVtQ1B/baz8AIOAibI2M0iAKwZ8Rpg70DIAEdDvAY4zSIIDPD6gIOwAfr4/CDlTNgAF3x5Q9aVsAFuSvj84C5BSL+HJ95A9PLGrs3HF5qxZvn548s/AYFBWPU7BIeEmkOYYeEROENRQDwSu/0OUUB/B8J4VpI4cjdjtAQe/QwxCIHYOKwGxAvh05+QiBBJSsbqgBRkXaneaSj601Eypzq2tJCRiqTCO5MtIgtZfzaKo3hysBiQm4ekIh8oUGCOS/8sh0JCBhiAtBWZw/yfPYsIA5g4kVRwF4M0lpSWYdU/q7wCiwFGashKuEAmyFbKYNU/qwpr2Vhdg2ECA3b9NdVY04FyrQcWE7Do95BUxp4U6+odMEzAop+7oRFngWQvaI5sQlNIcwu69lbBBBk8+bHNFFmxsG87hv0dbXjLAw1LQgWKZTE+/bIihIu0Tll8LYIuwgbw4iuVZboJG1CFt6qvJ2xANN5ALDIhpB/UVMBXs/RgL8sRzF78lSuDTR/2yINX75WEGgg2/Y7gBoZFFrIBZnpJ4FQsaUO4icJYJFjF21ns1YBsgNOEiVq2upMmSxHZyGIEZqMpaQj9kZOBomJK0qQ186bCPW45TYychuIEA2gJ0x4tQF5TVXl6d7mDwwwOdkayW8tGFYWFM8nXPgpGAdEAAEP98qSOUjrNAAAAAElFTkSuQmCC" alt="">
       Valider ce passage
@@ -856,8 +846,8 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
   <div id="agency-popup-type">Agence de communication</div>
   <div id="agency-popup-addr">Adresse</div>
   <div class="agency-popup-btns">
-    <button id="agency-btn-maps" onclick="openAgencyMaps()">📍 Google Maps</button>
-    <button id="agency-btn-cv" onclick="markCvDropped()">📄 CV déposé</button>
+    <button id="agency-btn-maps" onclick="openAgencyMaps()">📍 Voir la fiche</button>
+    <button id="agency-btn-cv" onclick="toggleCvDropped()">📄 CV déposé</button>
   </div>
 </div>
 
@@ -1160,16 +1150,10 @@ function saveCvDropped(arr) {
 }
 
 function createAgencyPin(visited) {
-  const color = visited ? '#888888' : '#E53935';
-  const inner = visited
-    ? `<text x="14" y="19" text-anchor="middle" font-size="13" fill="white" font-weight="bold">✕</text>`
-    : `<circle class="pin-dot" cx="14" cy="13" r="5" fill="white"/>`;
-  return `
-    <svg viewBox="0 0 28 36" xmlns="http://www.w3.org/2000/svg">
-      <ellipse class="pin-fill" cx="14" cy="13" rx="12" ry="12" fill="${color}"/>
-      <path class="pin-fill" d="M14 36 L6 22 Q2 17 2 13 A12 12 0 0 1 26 13 Q26 17 22 22 Z" fill="${color}"/>
-      ${inner}
-    </svg>`;
+  if (visited) {
+    return `<div style="width:20px;height:20px;border-radius:50%;background:#888;display:flex;align-items:center;justify-content:center;font-size:12px;color:white;font-weight:bold;box-shadow:0 2px 6px rgba(0,0,0,0.2);">✕</div>`;
+  }
+  return `<div style="width:20px;height:20px;border-radius:50%;background:white;border:3px solid #E53935;box-shadow:0 2px 6px rgba(229,57,53,0.3);"></div>`;
 }
 
 async function loadAgenciesNear(lat, lng) {
@@ -1218,8 +1202,8 @@ function processAgencies(elements) {
     const div = L.divIcon({
       className: '',
       html: `<div class="agency-marker${visited ? ' visited' : ''}" id="${id}"><div class="agency-pin">${createAgencyPin(visited)}</div></div>`,
-      iconSize: [28, 36],
-      iconAnchor: [14, 36]
+      iconSize: [20, 20],
+      iconAnchor: [10, 10]
     });
 
     const marker = L.marker([el.lat, el.lon], { icon: div }).addTo(map);
@@ -1267,32 +1251,49 @@ function closeAgencyPopup() {
 function openAgencyMaps() {
   const a = agencies.get(currentAgencyId);
   if (!a) return;
-  window.open(`https://www.google.com/maps/search/?api=1&query=${a.lat},${a.lng}`, '_blank');
+  // Recherche Google Maps par nom + adresse pour ouvrir la fiche de l'établissement
+  const q = encodeURIComponent(a.name + (a.addr !== 'Adresse non renseignée' ? ' ' + a.addr : ''));
+  window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank');
 }
 
-function markCvDropped() {
+function toggleCvDropped() {
   if (!currentAgencyId) return;
   const cvDropped = getCvDropped();
-  if (!cvDropped.includes(currentAgencyId)) {
+  const cvBtn = document.getElementById('agency-btn-cv');
+  const el = document.getElementById(currentAgencyId);
+
+  if (cvDropped.includes(currentAgencyId)) {
+    // Dé-valider : retirer le CV
+    const idx = cvDropped.indexOf(currentAgencyId);
+    cvDropped.splice(idx, 1);
+    saveCvDropped(cvDropped);
+    cvBtn.textContent = '📄 CV déposé';
+    cvBtn.classList.remove('done');
+    if (el) {
+      el.classList.remove('visited');
+      el.querySelector('.agency-pin').innerHTML = createAgencyPin(false);
+    }
+    const a = agencies.get(currentAgencyId);
+    if (a) a.visited = false;
+    showToast('CV retiré');
+  } else {
+    // Valider : ajouter le CV
     cvDropped.push(currentAgencyId);
     saveCvDropped(cvDropped);
+    cvBtn.textContent = '↩ Annuler le dépôt';
+    cvBtn.classList.add('done');
+    if (el) {
+      el.classList.add('visited');
+      el.querySelector('.agency-pin').innerHTML = createAgencyPin(true);
+    }
+    const a = agencies.get(currentAgencyId);
+    if (a) a.visited = true;
+    showToast('CV marqué comme déposé !');
   }
-
-  const cvBtn = document.getElementById('agency-btn-cv');
-  cvBtn.textContent = '✓ CV déposé';
-  cvBtn.classList.add('done');
-
-  const el = document.getElementById(currentAgencyId);
-  if (el) {
-    el.classList.add('visited');
-    el.querySelector('.agency-pin').innerHTML = createAgencyPin(true);
-  }
-  const a = agencies.get(currentAgencyId);
-  if (a) a.visited = true;
-
   refreshAgencyStats();
-  showToast('CV marqué comme déposé !');
 }
+
+function markCvDropped() { toggleCvDropped(); }
 
 function startGPS() {
   if (!navigator.geolocation) {
