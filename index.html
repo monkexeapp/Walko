@@ -677,6 +677,42 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 }
 #info-reset-icon { width: 14px; height: 14px; }
 
+/* ===== MESSAGE CHARGEMENT PASSAGES ===== */
+#loading-crosswalks {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 500;
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+}
+#loading-crosswalks.hidden { opacity: 0; }
+#loading-crosswalks-inner {
+  background: rgba(13, 24, 40, 0.82);
+  color: #A0B4C8;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(74,159,212,0.2);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  backdrop-filter: blur(6px);
+}
+#loading-crosswalks-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4A9FD4;
+  animation: cwPulse 1.2s ease-in-out infinite;
+}
+@keyframes cwPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
 /* ===== DARK STEEL DESIGN SYSTEM ===== */
 
 /* Grain texture overlay — intensité forte */
@@ -894,6 +930,12 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 
   <div id="map-wrap">
     <div id="map"></div>
+    <div id="loading-crosswalks">
+      <div id="loading-crosswalks-inner">
+        <div id="loading-crosswalks-dot"></div>
+        Chargement des passages piétons...
+      </div>
+    </div>
     <div id="recenter-btn" onclick="recenter()">
       <img src="data:image/png;base64,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" alt="">
     </div>
@@ -1319,6 +1361,10 @@ function onGPSError(err) {
 }
 
 async function loadCrosswalksNear(lat, lng) {
+  // Afficher le message de chargement
+  const cwLoader = document.getElementById('loading-crosswalks');
+  if (cwLoader) cwLoader.classList.remove('hidden');
+
   const d = 0.0063;
   const south = Math.max(lat - d, FRANCE_BOUNDS.south);
   const west = Math.max(lng - d, FRANCE_BOUNDS.west);
@@ -1329,7 +1375,6 @@ async function loadCrosswalksNear(lat, lng) {
   const query = `[out:json][timeout:20];node["highway"="crossing"](${bbox});out body;`;
   const encoded = encodeURIComponent(query);
 
-  // Plusieurs serveurs Overpass en fallback
   const servers = [
     `https://overpass-api.de/api/interpreter?data=${encoded}`,
     `https://overpass.kumi.systems/api/interpreter?data=${encoded}`,
@@ -1342,16 +1387,19 @@ async function loadCrosswalksNear(lat, lng) {
       if (!res.ok) continue;
       const data = await res.json();
       processCrosswalks(data.elements || []);
-      return; // succès, on arrête
-    } catch(e) {
-      // Serveur indisponible, on essaie le suivant
-    }
+      return;
+    } catch(e) {}
   }
   // Tous les serveurs ont échoué
+  if (cwLoader) cwLoader.classList.add('hidden');
   showToast('Erreur réseau — recharge si besoin');
 }
 
 function processCrosswalks(elements) {
+  // Masquer le message de chargement dès que les données arrivent
+  const cwLoader = document.getElementById('loading-crosswalks');
+  if (cwLoader) cwLoader.classList.add('hidden');
+
   const saved = getSaved();
   let added = 0;
 
