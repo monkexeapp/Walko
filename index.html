@@ -1361,9 +1361,7 @@ function onGPSError(err) {
 }
 
 async function loadCrosswalksNear(lat, lng) {
-  // Afficher le message de chargement
-  const cwLoader = document.getElementById('loading-crosswalks');
-  if (cwLoader) cwLoader.classList.remove('hidden');
+  showToast('Chargement des passages piétons...', null, true);
 
   const d = 0.0063;
   const south = Math.max(lat - d, FRANCE_BOUNDS.south);
@@ -1391,14 +1389,12 @@ async function loadCrosswalksNear(lat, lng) {
     } catch(e) {}
   }
   // Tous les serveurs ont échoué
-  if (cwLoader) cwLoader.classList.add('hidden');
   showToast('Erreur réseau — recharge si besoin');
 }
 
 function processCrosswalks(elements) {
-  // Masquer le message de chargement dès que les données arrivent
-  const cwLoader = document.getElementById('loading-crosswalks');
-  if (cwLoader) cwLoader.classList.add('hidden');
+  // Masquer le toast de chargement
+  hideToast();
 
   const saved = getSaved();
   let added = 0;
@@ -1692,12 +1688,18 @@ function getSaved() {
 }
 
 let toastTimer;
-function showToast(msg, icon) {
+function showToast(msg, icon, persistent) {
   const t = document.getElementById('toast');
   t.innerHTML = (icon ? `<img src="${icon}" alt="">` : '') + `<span>${msg}</span>`;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  if (!persistent) {
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  }
+}
+function hideToast() {
+  clearTimeout(toastTimer);
+  document.getElementById('toast').classList.remove('show');
 }
 
 </script>
