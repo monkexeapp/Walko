@@ -7,6 +7,10 @@
 // navigator.standalone = true UNIQUEMENT sur iOS en mode app installée
 if (window.navigator.standalone === true) {
   document.write('<style>body{background:#0A1220!important}#header{padding-top:69px!important}#loading{padding-top:69px!important}#info-btn{top:110px!important}#modal-card{padding-bottom:40px!important}</style>');
+  // Forcer Leaflet à recalculer la taille de la carte après le padding du header
+  window.addEventListener('load', () => {
+    setTimeout(() => { if (typeof map !== 'undefined') map.invalidateSize(); }, 300);
+  });
 }
 </script>
 
