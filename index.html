@@ -7,10 +7,6 @@
 // navigator.standalone = true UNIQUEMENT sur iOS en mode app installée
 if (window.navigator.standalone === true) {
   document.write('<style>body{background:#0A1220!important}#header{padding-top:69px!important}#loading{padding-top:69px!important}#info-btn{top:110px!important}#modal-card{padding-bottom:40px!important}</style>');
-  // Forcer Leaflet à recalculer la taille de la carte après le padding du header
-  window.addEventListener('load', () => {
-    setTimeout(() => { if (typeof map !== 'undefined') map.invalidateSize(); }, 300);
-  });
 }
 </script>
 
@@ -680,9 +676,8 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 /* ===== MESSAGE CHARGEMENT PASSAGES ===== */
 #loading-crosswalks {
   position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 16px;
+  right: 72px;
   z-index: 500;
   pointer-events: none;
   transition: opacity 0.4s ease;
@@ -930,7 +925,7 @@ html.js-vh-fix #app { height: var(--app-height, 100vh); }
 
   <div id="map-wrap">
     <div id="map"></div>
-    <div id="loading-crosswalks">
+    <div id="loading-crosswalks" class="hidden">
       <div id="loading-crosswalks-inner">
         <div id="loading-crosswalks-dot"></div>
         Chargement des passages piétons...
@@ -1059,6 +1054,12 @@ function startApp(demo) {
     startGPS();
   }
   refreshCounts();
+
+  // En mode standalone iOS, le padding de 69px est appliqué au header APRÈS initMap,
+  // donc on force Leaflet à recalculer la taille de la carte
+  if (window.navigator.standalone === true) {
+    setTimeout(() => { if (map) map.invalidateSize(); }, 400);
+  }
 
   // On laisse le navigateur peindre l'app à sa taille réelle (pour que Leaflet s'initialise
   // correctement) avant de déclencher l'animation purement visuelle de fade + zoom léger.
@@ -1361,7 +1362,9 @@ function onGPSError(err) {
 }
 
 async function loadCrosswalksNear(lat, lng) {
-  showToast('Chargement des passages piétons...', null, true);
+  // Afficher uniquement le message custom en bas de la carte
+  const cwLoader = document.getElementById('loading-crosswalks');
+  if (cwLoader) cwLoader.classList.remove('hidden');
 
   const d = 0.0063;
   const south = Math.max(lat - d, FRANCE_BOUNDS.south);
@@ -1393,8 +1396,9 @@ async function loadCrosswalksNear(lat, lng) {
 }
 
 function processCrosswalks(elements) {
-  // Masquer le toast de chargement
-  hideToast();
+  // Masquer le message de chargement custom
+  const cwLoader = document.getElementById('loading-crosswalks');
+  if (cwLoader) cwLoader.classList.add('hidden');
 
   const saved = getSaved();
   let added = 0;
